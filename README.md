@@ -19,3 +19,13 @@ python number_reader.py path/to/<photo>_screen.png --json
 ```
 
 Add `--gpu` if your system has CUDA available; otherwise it runs on CPU.
+
+## Full pipeline
+
+Process a raw photo and print labeled readings in one go:
+
+```bash
+python process_screen.py path/to/photo.jpg --screen-output path/to/screen.png --json
+```
+
+`--screen-output` is optional; omit it to drop the intermediate file after reading.
