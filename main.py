@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import os
 import re
 import uuid
 from pathlib import Path
 from typing import Optional, Iterable
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends, Header
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -50,11 +51,22 @@ def _save_upload(upload: UploadFile, suffix: str = ".jpg") -> Path:
     return out
 
 
+FIXED_TOKEN = os.environ.get("FIXED_TOKEN", "331")  # keep as string
+
+
+def verify_fixed_token(authorization: str = Header(...)):
+    if not FIXED_TOKEN or authorization != f"{FIXED_TOKEN}":
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid authorization token",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    return True
 @app.get("/health")
 def health():
     return {"ok": True}
 
-@app.post("/gauges/read", response_model=GaugeReadingsOut)
+@app.post("/gauges/read", response_model=GaugeReadingsOut ,  dependencies=[Depends(verify_fixed_token)])
 async def gauges_read(
     image: UploadFile = File(...),
     save_screen: bool = Form(False),
