@@ -1,4 +1,3 @@
-# Add debugging to your Dockerfile temporarily:
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -7,24 +6,24 @@ ENV APP_HOME /app
 
 WORKDIR $APP_HOME
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+# Minimal dependencies for headless OpenCV and other libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     libsm6 \
-    libxrender1 \
     libxext6 \
-    libglu1-mesa \
+    libgl1 \
+    libpng16-16 \
+    libjpeg62-turbo \
+    libtiff6 \
+    libwebp7 \
+    libopenjp2-7 \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . $APP_HOME
-
-# DEBUG: List files
-RUN echo "=== Files in /app ===" && ls -la
 
 EXPOSE 8006
 
