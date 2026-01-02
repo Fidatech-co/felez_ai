@@ -7,9 +7,16 @@ ENV APP_HOME /app
 
 WORKDIR $APP_HOME
 
-# Install dependencies
-#RUN apt-get update && apt-get install -y --no-install-recommends \
-#    gcc python3-dev && rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxrender1 \
+    libxext6 \
+    libglu1-mesa \
+    && rm -rf /var/lib/apt/lists/*
+
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
