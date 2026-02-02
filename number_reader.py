@@ -7,6 +7,21 @@ import json
 from pathlib import Path
 from typing import Dict, Iterable, Tuple
 
+import torch
+torch.backends.nnpack.enabled = False
+import torch.utils.data as torch_data
+
+OriginalDataLoader = torch_data.DataLoader
+
+
+class NoPinMemoryDataLoader(OriginalDataLoader):
+    def __init__(self, *args, **kwargs):
+        kwargs["pin_memory"] = False
+        super().__init__(*args, **kwargs)
+
+
+torch_data.DataLoader = NoPinMemoryDataLoader  # Force pin_memory off before EasyOCR builds its dataloaders.
+
 import cv2
 import easyocr
 import numpy as np
